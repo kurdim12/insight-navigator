@@ -12,6 +12,7 @@ import ContentOptimizer from "@/pages/ContentOptimizer";
 import Billing from "@/pages/Billing";
 import SettingsPage from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
+import Landing from "@/pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +23,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Public routes */}
+          <Route path="/" element={<Landing />} />
+
+          {/* Protected routes - wrapped in DashboardLayout */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/websites" element={<Websites />} />
@@ -32,6 +36,7 @@ const App = () => (
             <Route path="/billing" element={<Billing />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

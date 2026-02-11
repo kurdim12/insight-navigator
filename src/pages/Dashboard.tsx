@@ -1,4 +1,7 @@
-import { Globe, BarChart3, AlertTriangle, Activity } from "lucide-react";
+/**
+ * Dashboard - Main overview page with real backend data
+ */
+import { Globe, BarChart3, AlertTriangle, Activity, Plus, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,150 +9,193 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { ScoreBadge } from "@/components/ScoreBadge";
-import { mockWebsites, mockScans, mockScoreHistory } from "@/lib/mock-data";
+import { useWebsites } from "@/hooks/useWebsites";
+import { useScans } from "@/hooks/useScans";
 import { getScoreLevel } from "@/lib/types";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Plus, Play } from "lucide-react";
-
-const avgScore = Math.round(
-  mockWebsites.filter((w) => w.latest_seo_score !== null).reduce((a, w) => a + (w.latest_seo_score ?? 0), 0) /
-    mockWebsites.filter((w) => w.latest_seo_score !== null).length
-);
-
-const criticalIssues = mockScans
-  .filter((s) => s.status === "completed")
-  .reduce((a, s) => a + s.issues_found, 0);
+import { Skeleton } from "@/components/ui/skeleton";
 
 const statusBadge = (status: string) => {
   switch (status) {
     case "completed":
-      return <Badge variant="outline" className="bg-score-good/10 text-score-good border-score-good/30">Completed</Badge>;
+      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Completed</Badge>;
     case "running":
-      return <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">Running</Badge>;
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Running</Badge>;
+    case "pending":
+      return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending</Badge>;
     case "failed":
-      return <Badge variant="outline" className="bg-score-critical/10 text-score-critical border-score-critical/30">Failed</Badge>;
+      return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Failed</Badge>;
     default:
-      return null;
+      return <Badge variant="outline">Unknown</Badge>;
   }
 };
 
 export default function Dashboard() {
+  const { data: websites, isLoading: websitesLoading } = useWebsites();
+  const { data: scans, isLoading: scansLoading } = useScans();
+
+  // Calculate stats
+  const totalWebsites = websites?.length || 0;
+  const totalScans = scans?.length || 0;
+
+  const avgScore = websites && websites.length > 0
+    ? Math.round(
+        websites
+          .map(w => scans?.filter(s => s.website_id === w.id && s.seo_score !== null)?.[0]?.seo_score || 0)
+          .filter(score => score > 0)
+          .reduce((a, b) => a + b, 0) / Math.max(websites.length, 1)
+      )
+    : 0;
+
+  const completedScans = scans?.filter(s => s.status === "completed") || [];
+  const recentScans = scans?.slice(0, 10) || [];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Welcome back! Here's your SEO overview.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link to="/websites"><Plus className="mr-1.5 h-4 w-4" /> Add Website</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/websites"><Play className="mr-1.5 h-4 w-4" /> Run Scan</Link>
+            <Link to="/websites">
+              <Plus className="mr-2 h-4 w-4" /> Add Website
+            </Link>
           </Button>
         </div>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatsCard title="Total Websites" value={mockWebsites.length} icon={Globe} />
-        <StatsCard title="Scans This Month" value={mockScans.length} icon={BarChart3} />
-        <StatsCard title="Average SEO Score" value={avgScore} icon={Activity} />
-        <StatsCard title="Total Issues" value={criticalIssues} icon={AlertTriangle} />
+        {websitesLoading ? (
+          <>
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+          </>
+        ) : (
+          <>
+            <StatsCard title="Total Websites" value={totalWebsites} icon={Globe} />
+            <StatsCard title="Scans This Month" value={totalScans} icon={BarChart3} />
+            <StatsCard title="Average SEO Score" value={avgScore} icon={Activity} />
+            <StatsCard
+              title="Completed Scans"
+              value={completedScans.length}
+              icon={AlertTriangle}
+            />
+          </>
+        )}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          <CardHeader>
-            <CardTitle className="text-base">SEO Score Trend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[240px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockScoreHistory}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="date" className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
-                  <YAxis domain={[0, 100]} className="text-xs" tick={{ fill: "hsl(var(--muted-foreground))" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "var(--radius)",
-                    }}
-                  />
-                  <Line type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: "hsl(var(--primary))" }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="animate-fade-in" style={{ animationDelay: "0.15s" }}>
-          <CardHeader>
-            <CardTitle className="text-base">Issues by Severity</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {[
-              { label: "Critical", count: 3, color: "bg-score-critical" },
-              { label: "Warnings", count: 3, color: "bg-score-warning" },
-              { label: "Info", count: 2, color: "bg-primary" },
-            ].map((item) => (
-              <div key={item.label} className="space-y-1.5">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{item.label}</span>
-                  <span className="font-medium">{item.count}</span>
-                </div>
-                <div className="h-2 rounded-full bg-muted">
-                  <div
-                    className={`h-full rounded-full ${item.color}`}
-                    style={{ width: `${(item.count / 8) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-        <CardHeader>
-          <CardTitle className="text-base">Recent Scans</CardTitle>
+      {/* Recent Scans Table */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">Recent Scans</CardTitle>
+          {totalScans === 0 && !scansLoading && (
+            <Button asChild size="sm">
+              <Link to="/websites">Start Your First Scan</Link>
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Website</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead>Pages</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockScans.map((scan) => (
-                <TableRow key={scan.id}>
-                  <TableCell className="font-medium">{scan.website_name}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {new Date(scan.started_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <ScoreBadge score={scan.seo_score} level={scan.seo_score ? getScoreLevel(scan.seo_score) : "critical"} />
-                  </TableCell>
-                  <TableCell>{scan.pages_scanned}</TableCell>
-                  <TableCell>{statusBadge(scan.status)}</TableCell>
-                  <TableCell className="text-right">
-                    {scan.status === "completed" && (
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link to={`/reports/${scan.id}`}>View Report</Link>
-                      </Button>
-                    )}
-                  </TableCell>
+          {scansLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ) : recentScans.length === 0 ? (
+            <div className="text-center py-12">
+              <Globe className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No scans yet</h3>
+              <p className="text-gray-500 mb-4">Add a website and start your first SEO scan</p>
+              <Button asChild>
+                <Link to="/websites">
+                  <Plus className="mr-2 h-4 w-4" /> Add Website
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Website ID</TableHead>
+                  <TableHead>Started</TableHead>
+                  <TableHead>Score</TableHead>
+                  <TableHead>Pages</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {recentScans.map((scan) => {
+                  const website = websites?.find(w => w.id === scan.website_id);
+
+                  return (
+                    <TableRow key={scan.id}>
+                      <TableCell className="font-medium">
+                        {website?.domain || scan.website_id.slice(0, 8)}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {new Date(scan.started_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {scan.seo_score !== null ? (
+                          <ScoreBadge
+                            score={scan.seo_score}
+                            level={getScoreLevel(scan.seo_score)}
+                          />
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell>{scan.pages_scanned}</TableCell>
+                      <TableCell>{statusBadge(scan.status)}</TableCell>
+                      <TableCell className="text-right">
+                        {scan.status === "completed" ? (
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link to={`/reports/${scan.id}`}>View Report</Link>
+                          </Button>
+                        ) : scan.status === "running" ? (
+                          <span className="text-sm text-muted-foreground">In progress...</span>
+                        ) : null}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Button variant="outline" className="h-24 flex-col gap-2" asChild>
+              <Link to="/websites">
+                <Globe className="h-8 w-8" />
+                <span>Manage Websites</span>
+              </Link>
+            </Button>
+            <Button variant="outline" className="h-24 flex-col gap-2" asChild>
+              <Link to="/content-optimizer">
+                <BarChart3 className="h-8 w-8" />
+                <span>Content Optimizer</span>
+              </Link>
+            </Button>
+            <Button variant="outline" className="h-24 flex-col gap-2" asChild>
+              <Link to="/settings">
+                <Activity className="h-8 w-8" />
+                <span>Settings</span>
+              </Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
