@@ -1,25 +1,27 @@
 export interface Website {
   id: string;
   url: string;
-  name: string;
+  domain: string;
+  user_id: string;
   verified: boolean;
-  last_scan_date: string | null;
-  latest_seo_score: number | null;
+  verified_at: string | null;
+  verification_token: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Scan {
   id: string;
   website_id: string;
-  website_name: string;
-  website_url: string;
-  status: "completed" | "running" | "failed";
+  status: "pending" | "running" | "completed" | "failed";
   seo_score: number | null;
   performance_score: number | null;
   pages_scanned: number;
-  issues_found: number;
   started_at: string;
   completed_at: string | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Issue {
