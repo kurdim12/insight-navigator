@@ -1,6 +1,3 @@
-/**
- * Landing Page - Public facing homepage
- */
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -121,7 +118,6 @@ export default function Landing() {
         </h2>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {/* Free Plan */}
           <Card>
             <CardHeader>
               <CardTitle>Starter</CardTitle>
@@ -130,22 +126,12 @@ export default function Landing() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>5 websites</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>50 scans/month</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>100 AI optimizations</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Email support</span>
-                </li>
+                {["5 websites", "50 scans/month", "100 AI optimizations", "Email support"].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-600" />
+                    <span>{f}</span>
+                  </li>
+                ))}
               </ul>
               <Link to="/sign-up">
                 <Button className="w-full mt-6">Get Started</Button>
@@ -153,7 +139,6 @@ export default function Landing() {
             </CardContent>
           </Card>
 
-          {/* Pro Plan */}
           <Card className="border-blue-600 border-2 relative">
             <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2">
               Most Popular
@@ -165,30 +150,12 @@ export default function Landing() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>25 websites</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>500 scans/month</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Unlimited AI optimizations</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Priority support</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>White-label PDFs</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>API access</span>
-                </li>
+                {["25 websites", "500 scans/month", "Unlimited AI optimizations", "Priority support", "White-label PDFs", "API access"].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-600" />
+                    <span>{f}</span>
+                  </li>
+                ))}
               </ul>
               <Link to="/sign-up">
                 <Button className="w-full mt-6" variant="default">Get Started</Button>
@@ -196,7 +163,6 @@ export default function Landing() {
             </CardContent>
           </Card>
 
-          {/* Agency Plan */}
           <Card>
             <CardHeader>
               <CardTitle>Agency</CardTitle>
@@ -205,30 +171,12 @@ export default function Landing() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Unlimited websites</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Unlimited scans</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Unlimited everything</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Dedicated support</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Client management</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-600" />
-                  <span>Custom branding</span>
-                </li>
+                {["Unlimited websites", "Unlimited scans", "Unlimited everything", "Dedicated support", "Client management", "Custom branding"].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-600" />
+                    <span>{f}</span>
+                  </li>
+                ))}
               </ul>
               <Link to="/sign-up">
                 <Button className="w-full mt-6">Get Started</Button>

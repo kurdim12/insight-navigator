@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 
 const scoreStyles: Record<ScoreLevel, string> = {
   good: "bg-score-good/15 text-score-good border-score-good/30",
-  warning: "bg-score-warning/15 text-score-warning border-score-warning/30",
-  critical: "bg-score-critical/15 text-score-critical border-score-critical/30",
+  average: "bg-score-warning/15 text-score-warning border-score-warning/30",
+  poor: "bg-score-critical/15 text-score-critical border-score-critical/30",
 };
 
 export function ScoreBadge({

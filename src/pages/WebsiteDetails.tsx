@@ -14,6 +14,7 @@ export default function WebsiteDetails() {
   const { id } = useParams();
   const website = mockWebsites.find((w) => w.id === id) ?? mockWebsites[0];
   const scans = mockScans.filter((s) => s.website_id === website.id);
+  const latestCompleted = scans.find((s) => s.status === "completed");
 
   const copy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -28,7 +29,7 @@ export default function WebsiteDetails() {
         </Button>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">{website.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{website.domain}</h1>
             {website.verified && <CheckCircle2 className="h-5 w-5 text-score-good" />}
           </div>
           <p className="text-muted-foreground text-sm">{website.url}</p>
@@ -53,26 +54,26 @@ export default function WebsiteDetails() {
             <Card>
               <CardContent className="p-5 text-center">
                 <p className="text-sm text-muted-foreground">SEO Score</p>
-                <p className="mt-1 text-4xl font-bold" style={{ color: website.latest_seo_score ? `hsl(var(--score-${getScoreLevel(website.latest_seo_score)}))` : undefined }}>
-                  {website.latest_seo_score ?? "—"}
+                <p className="mt-1 text-4xl font-bold">
+                  {latestCompleted?.seo_score ?? "—"}
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-5 text-center">
                 <p className="text-sm text-muted-foreground">Pages Scanned</p>
-                <p className="mt-1 text-4xl font-bold">{scans[0]?.pages_scanned ?? 0}</p>
+                <p className="mt-1 text-4xl font-bold">{latestCompleted?.pages_scanned ?? 0}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-5 text-center">
-                <p className="text-sm text-muted-foreground">Issues Found</p>
-                <p className="mt-1 text-4xl font-bold">{scans[0]?.issues_found ?? 0}</p>
+                <p className="text-sm text-muted-foreground">Performance</p>
+                <p className="mt-1 text-4xl font-bold">{latestCompleted?.performance_score ?? "—"}</p>
               </CardContent>
             </Card>
           </div>
-          {scans[0]?.status === "completed" && (
-            <Button asChild><Link to={`/reports/${scans[0].id}`}>View Full Report</Link></Button>
+          {latestCompleted && (
+            <Button asChild><Link to={`/reports/${latestCompleted.id}`}>View Full Report</Link></Button>
           )}
         </TabsContent>
 
@@ -85,20 +86,18 @@ export default function WebsiteDetails() {
                     <TableHead>Date</TableHead>
                     <TableHead>Score</TableHead>
                     <TableHead>Pages</TableHead>
-                    <TableHead>Issues</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {scans.length === 0 ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No scans yet</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No scans yet</TableCell></TableRow>
                   ) : scans.map((scan) => (
                     <TableRow key={scan.id}>
                       <TableCell>{new Date(scan.started_at).toLocaleString()}</TableCell>
-                      <TableCell><ScoreBadge score={scan.seo_score} level={scan.seo_score ? getScoreLevel(scan.seo_score) : "critical"} /></TableCell>
+                      <TableCell><ScoreBadge score={scan.seo_score} level={scan.seo_score !== null ? getScoreLevel(scan.seo_score) : "poor"} /></TableCell>
                       <TableCell>{scan.pages_scanned}</TableCell>
-                      <TableCell>{scan.issues_found}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{scan.status}</Badge>
                       </TableCell>
@@ -123,8 +122,8 @@ export default function WebsiteDetails() {
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">Add the following TXT record to your domain's DNS settings:</p>
               <div className="flex items-center gap-2 rounded-md bg-muted p-3 font-mono text-sm">
-                <span className="flex-1 truncate">devseo-verify=a1b2c3d4e5f6g7h8i9j0</span>
-                <Button variant="ghost" size="icon" className="shrink-0" onClick={() => copy("devseo-verify=a1b2c3d4e5f6g7h8i9j0")}>
+                <span className="flex-1 truncate">devseo-verify={website.verification_token}</span>
+                <Button variant="ghost" size="icon" className="shrink-0" onClick={() => copy(`devseo-verify=${website.verification_token}`)}>
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -136,8 +135,8 @@ export default function WebsiteDetails() {
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">Add this meta tag inside your page's &lt;head&gt;:</p>
               <div className="flex items-center gap-2 rounded-md bg-muted p-3 font-mono text-sm">
-                <span className="flex-1 truncate">&lt;meta name="devseo-verify" content="a1b2c3d4e5f6g7h8i9j0" /&gt;</span>
-                <Button variant="ghost" size="icon" className="shrink-0" onClick={() => copy('<meta name="devseo-verify" content="a1b2c3d4e5f6g7h8i9j0" />')}>
+                <span className="flex-1 truncate">&lt;meta name="devseo-verify" content="{website.verification_token}" /&gt;</span>
+                <Button variant="ghost" size="icon" className="shrink-0" onClick={() => copy(`<meta name="devseo-verify" content="${website.verification_token}" />`)}>
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
