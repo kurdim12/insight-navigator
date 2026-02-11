@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, ExternalLink, Trash2, Play, CheckCircle2 } from "lucide-react";
+import { Plus, Search, ExternalLink, Trash2, Play, CheckCircle2, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -16,11 +15,10 @@ export default function Websites() {
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newUrl, setNewUrl] = useState("");
-  const [newName, setNewName] = useState("");
 
   const filtered = mockWebsites.filter(
     (w) =>
-      w.name.toLowerCase().includes(search.toLowerCase()) ||
+      w.domain.toLowerCase().includes(search.toLowerCase()) ||
       w.url.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -29,7 +27,6 @@ export default function Websites() {
     toast.success("Website added successfully!");
     setDialogOpen(false);
     setNewUrl("");
-    setNewName("");
   };
 
   return (
@@ -51,10 +48,6 @@ export default function Websites() {
               <div className="space-y-2">
                 <Label htmlFor="url">Website URL</Label>
                 <Input id="url" placeholder="https://example.com" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="name">Name (optional)</Label>
-                <Input id="name" placeholder="My Website" value={newName} onChange={(e) => setNewName(e.target.value)} />
               </div>
             </div>
             <DialogFooter>
@@ -88,21 +81,16 @@ export default function Websites() {
                 <div className="flex items-start justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold truncate">{website.name}</h3>
+                      <h3 className="font-semibold truncate">{website.domain}</h3>
                       {website.verified && (
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-score-good" />
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground truncate">{website.url}</p>
                   </div>
-                  {website.latest_seo_score !== null && (
-                    <ScoreBadge score={website.latest_seo_score} level={getScoreLevel(website.latest_seo_score)} />
-                  )}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {website.last_scan_date
-                    ? `Last scan: ${new Date(website.last_scan_date).toLocaleDateString()}`
-                    : "No scans yet"}
+                  Created: {new Date(website.created_at).toLocaleDateString()}
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="flex-1" asChild>
@@ -123,13 +111,5 @@ export default function Websites() {
         </div>
       )}
     </div>
-  );
-}
-
-function Globe(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" />
-    </svg>
   );
 }

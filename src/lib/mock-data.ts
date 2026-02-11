@@ -1,34 +1,34 @@
 import type { Website, Scan, ScanReport, ContentOptimizeResult } from "./types";
 
 export const mockWebsites: Website[] = [
-  { id: "1", url: "https://example.com", name: "Example Corp", verified: true, last_scan_date: "2026-02-10T14:30:00Z", latest_seo_score: 82, created_at: "2026-01-15T10:00:00Z" },
-  { id: "2", url: "https://myblog.dev", name: "My Tech Blog", verified: true, last_scan_date: "2026-02-09T11:00:00Z", latest_seo_score: 64, created_at: "2026-01-20T08:00:00Z" },
-  { id: "3", url: "https://shop.arabmarket.sa", name: "Arab Market", verified: false, last_scan_date: null, latest_seo_score: null, created_at: "2026-02-08T16:00:00Z" },
-  { id: "4", url: "https://portfolio.design", name: "Design Portfolio", verified: true, last_scan_date: "2026-02-11T09:00:00Z", latest_seo_score: 91, created_at: "2026-01-10T12:00:00Z" },
+  { id: "1", url: "https://example.com", domain: "example.com", user_id: "u1", verified: true, verified_at: "2026-01-16T10:00:00Z", verification_token: "abc123", created_at: "2026-01-15T10:00:00Z", updated_at: "2026-02-10T14:30:00Z" },
+  { id: "2", url: "https://myblog.dev", domain: "myblog.dev", user_id: "u1", verified: true, verified_at: "2026-01-21T08:00:00Z", verification_token: "def456", created_at: "2026-01-20T08:00:00Z", updated_at: "2026-02-09T11:00:00Z" },
+  { id: "3", url: "https://shop.arabmarket.sa", domain: "shop.arabmarket.sa", user_id: "u1", verified: false, verified_at: null, verification_token: "ghi789", created_at: "2026-02-08T16:00:00Z", updated_at: "2026-02-08T16:00:00Z" },
+  { id: "4", url: "https://portfolio.design", domain: "portfolio.design", user_id: "u1", verified: true, verified_at: "2026-01-11T12:00:00Z", verification_token: "jkl012", created_at: "2026-01-10T12:00:00Z", updated_at: "2026-02-11T09:00:00Z" },
 ];
 
 export const mockScans: Scan[] = [
-  { id: "s1", website_id: "1", website_name: "Example Corp", website_url: "https://example.com", status: "completed", seo_score: 82, performance_score: 78, pages_scanned: 24, issues_found: 8, started_at: "2026-02-10T14:00:00Z", completed_at: "2026-02-10T14:30:00Z" },
-  { id: "s2", website_id: "2", website_name: "My Tech Blog", website_url: "https://myblog.dev", status: "completed", seo_score: 64, performance_score: 55, pages_scanned: 12, issues_found: 15, started_at: "2026-02-09T10:30:00Z", completed_at: "2026-02-09T11:00:00Z" },
-  { id: "s3", website_id: "4", website_name: "Design Portfolio", website_url: "https://portfolio.design", status: "completed", seo_score: 91, performance_score: 88, pages_scanned: 8, issues_found: 3, started_at: "2026-02-11T08:30:00Z", completed_at: "2026-02-11T09:00:00Z" },
-  { id: "s4", website_id: "1", website_name: "Example Corp", website_url: "https://example.com", status: "running", seo_score: null, performance_score: null, pages_scanned: 0, issues_found: 0, started_at: "2026-02-11T12:00:00Z", completed_at: null },
-  { id: "s5", website_id: "2", website_name: "My Tech Blog", website_url: "https://myblog.dev", status: "failed", seo_score: null, performance_score: null, pages_scanned: 3, issues_found: 0, started_at: "2026-02-08T09:00:00Z", completed_at: "2026-02-08T09:05:00Z" },
+  { id: "s1", website_id: "1", status: "completed", seo_score: 82, performance_score: 78, pages_scanned: 24, started_at: "2026-02-10T14:00:00Z", completed_at: "2026-02-10T14:30:00Z", error_message: null, created_at: "2026-02-10T14:00:00Z", updated_at: "2026-02-10T14:30:00Z" },
+  { id: "s2", website_id: "2", status: "completed", seo_score: 64, performance_score: 55, pages_scanned: 12, started_at: "2026-02-09T10:30:00Z", completed_at: "2026-02-09T11:00:00Z", error_message: null, created_at: "2026-02-09T10:30:00Z", updated_at: "2026-02-09T11:00:00Z" },
+  { id: "s3", website_id: "4", status: "completed", seo_score: 91, performance_score: 88, pages_scanned: 8, started_at: "2026-02-11T08:30:00Z", completed_at: "2026-02-11T09:00:00Z", error_message: null, created_at: "2026-02-11T08:30:00Z", updated_at: "2026-02-11T09:00:00Z" },
+  { id: "s4", website_id: "1", status: "running", seo_score: null, performance_score: null, pages_scanned: 0, started_at: "2026-02-11T12:00:00Z", completed_at: null, error_message: null, created_at: "2026-02-11T12:00:00Z", updated_at: "2026-02-11T12:00:00Z" },
+  { id: "s5", website_id: "2", status: "failed", seo_score: null, performance_score: null, pages_scanned: 3, started_at: "2026-02-08T09:00:00Z", completed_at: "2026-02-08T09:05:00Z", error_message: "Connection timeout", created_at: "2026-02-08T09:00:00Z", updated_at: "2026-02-08T09:05:00Z" },
 ];
 
 export const mockScanReport: ScanReport = {
   id: "s1",
   website_id: "1",
-  website_name: "Example Corp",
-  website_url: "https://example.com",
   status: "completed",
   seo_score: 82,
   performance_score: 78,
   readability_score: 71,
   readability_grade: "7th-8th grade",
   pages_scanned: 24,
-  issues_found: 8,
   started_at: "2026-02-10T14:00:00Z",
   completed_at: "2026-02-10T14:30:00Z",
+  error_message: null,
+  created_at: "2026-02-10T14:00:00Z",
+  updated_at: "2026-02-10T14:30:00Z",
   issues: [
     { type: "missing_meta", severity: "critical", message: "Missing meta description tag in HTML head", simple_message: "Your page doesn't have a description. Add one so Google knows what your page is about.", suggestion: "Add a <meta name='description'> tag with 150-160 characters.", affected_pages: 3, page_urls: ["/about", "/contact", "/blog/old-post"] },
     { type: "missing_alt", severity: "critical", message: "Images missing alt attributes", simple_message: "Some images don't have descriptions. Screen readers and Google can't understand them.", suggestion: "Add descriptive alt text to all <img> tags.", affected_pages: 5, page_urls: ["/", "/products", "/about", "/gallery", "/team"] },

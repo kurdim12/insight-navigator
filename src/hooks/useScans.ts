@@ -1,13 +1,7 @@
-/**
- * React Query hooks for Scan API
- */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { scanApi } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
-/**
- * Fetch all scans (optionally filtered by website)
- */
 export function useScans(websiteId?: string) {
   return useQuery({
     queryKey: websiteId ? ['scans', websiteId] : ['scans'],
@@ -15,27 +9,21 @@ export function useScans(websiteId?: string) {
   });
 }
 
-/**
- * Fetch single scan report
- */
 export function useScan(id: string) {
   return useQuery({
     queryKey: ['scans', id],
     queryFn: () => scanApi.get(id),
     enabled: !!id,
-    // Refetch every 3 seconds if scan is running
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
+      const data = query.state.data;
       if (data?.status === 'running' || data?.status === 'pending') {
-        return 3000; // Poll every 3 seconds
+        return 3000;
       }
-      return false; // Stop polling when complete/failed
+      return false;
     },
   });
 }
 
-/**
- * Start a new scan
- */
 export function useStartScan() {
   const queryClient = useQueryClient();
   const { toast } = useToast();

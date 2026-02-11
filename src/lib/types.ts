@@ -81,10 +81,10 @@ export interface ContentOptimizeResult {
   };
 }
 
-export type ScoreLevel = "good" | "warning" | "critical";
+export type ScoreLevel = "good" | "average" | "poor";
 
 export function getScoreLevel(score: number): ScoreLevel {
-  if (score >= 71) return "good";
-  if (score >= 41) return "warning";
-  return "critical";
+  if (score >= 80) return "good";
+  if (score >= 50) return "average";
+  return "poor";
 }

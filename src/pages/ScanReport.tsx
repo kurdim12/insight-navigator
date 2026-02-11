@@ -29,6 +29,8 @@ export default function ScanReport() {
     ? report.issues
     : report.issues.filter((i) => i.severity === severityFilter);
 
+  const issuesCount = report.issues.length;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -38,7 +40,7 @@ export default function ScanReport() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold tracking-tight">Scan Report</h1>
           <p className="text-muted-foreground text-sm">
-            {report.website_url} · {report.completed_at ? new Date(report.completed_at).toLocaleString() : "In progress"}
+            Website {report.website_id} · {report.completed_at ? new Date(report.completed_at).toLocaleString() : "In progress"}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -58,7 +60,7 @@ export default function ScanReport() {
           { label: "Performance", value: report.performance_score, score: true },
           { label: "Readability", value: report.readability_score, score: true, sub: report.readability_grade },
           { label: "Pages Scanned", value: report.pages_scanned },
-          { label: "Issues Found", value: report.issues_found },
+          { label: "Issues Found", value: issuesCount },
         ].map((item, i) => (
           <Card key={item.label} className="animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
             <CardContent className="p-5 text-center">
